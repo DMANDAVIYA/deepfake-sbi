@@ -1,9 +1,26 @@
+import subprocess
 import sys
 from pathlib import Path
 import numpy as np
 import torch
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "SelfBlendedImages" / "src"))
+_SBI_DIR = Path(__file__).resolve().parents[1] / "SelfBlendedImages"
+_SBI_SRC = _SBI_DIR / "src"
+
+
+def _ensure_sbi_repo() -> None:
+    if not (_SBI_SRC / "model.py").exists():
+        print("SelfBlendedImages source not found — cloning...")
+        _SBI_DIR.mkdir(parents=True, exist_ok=True)
+        subprocess.run(
+            ["git", "clone", "https://github.com/mapooon/SelfBlendedImages", str(_SBI_DIR)],
+            check=True,
+        )
+
+
+_ensure_sbi_repo()
+
+sys.path.insert(0, str(_SBI_SRC))
 
 from model import Detector
 from inference.preprocess import extract_frames
